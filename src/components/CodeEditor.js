@@ -10,12 +10,29 @@ function CodeEditor() {
   const [error, setError] = useState('');
   const [status, setStatus] = useState('idle'); // idle, compiling, success, error
   const [editorReady, setEditorReady] = useState(false);
+  const [input, setInput] = useState('');
+  const [showInput, setShowInput] = useState(false);
 
   // Default code sample
-  const defaultCode = `#include <iostream>
+  const defaultCode = `#include<bits/stdc++.h>
+#include <iostream>
+using namespace std;
 
 int main() {
-  std::cout << "Hello, World!" << std::endl;
+  cout << "Hello, World!" << endl;
+  return 0;
+}`;
+
+  // Code sample with input
+  const inputCode = `#include<bits/stdc++.h>
+#include <iostream>
+using namespace std;
+
+int main() {
+  string name;
+  cout << "What is your name? ";
+  cin>>name;
+  cout << "Hello, " << name << "!" << endl;
   return 0;
 }`;
 
@@ -25,10 +42,21 @@ int main() {
 
   const handleEditorChange = (value) => {
     setCode(value);
+    
+    // Check if code likely needs input (contains cin, getline, etc.)
+    const needsInput = value.includes('cin') || 
+                       value.includes('getline') || 
+                       value.includes('scanf');
+    
+    setShowInput(needsInput);
   };
 
   const handleEditorDidMount = () => {
     setEditorReady(true);
+  };
+
+  const handleInputChange = (e) => {
+    setInput(e.target.value);
   };
 
   const handleCompile = async () => {
@@ -38,8 +66,11 @@ int main() {
     setOutput('');
     
     try {
-      // With proxy in package.json, use relative URL
-      const response = await axios.post('/api/compile', { code });
+      // Send code and input to backend
+      const response = await axios.post('/api/compile', { 
+        code,
+        input: input.trim() // Include input if provided
+      });
       
       if (response.data.success) {
         setOutput(response.data.output || 'Program executed successfully but produced no output.');
@@ -76,10 +107,28 @@ int main() {
     setStatus('idle');
   };
 
+  const setCodeExample = (example) => {
+    if (example === 'input') {
+      setCode(inputCode);
+      setShowInput(true);
+    } else {
+      setCode(defaultCode);
+      setShowInput(false);
+    }
+  };
+
   return (
     <div className="code-editor-container" onKeyDown={handleKeyDown}>
       <div className="editor-header">
         <h1>C++ Code Editor</h1>
+        <div className="code-examples">
+          <button onClick={() => setCodeExample('no-input')} className="example-button">
+            Basic Example
+          </button>
+          <button onClick={() => setCodeExample('input')} className="example-button">
+            Input Example
+          </button>
+        </div>
         <div className="status-indicator">
           {status === 'compiling' && <span className="status compiling">Compiling...</span>}
           {status === 'success' && <span className="status success">Compilation Successful</span>}
@@ -131,6 +180,22 @@ int main() {
               {isCompiling ? 'Compiling...' : 'Compile & Run'}
             </button>
           </div>
+          
+          {/* Input container that shows only when needed */}
+          {showInput && (
+            <div className="input-container">
+              <div className="input-header">
+                <h3>Program Input</h3>
+              </div>
+              <textarea
+                value={input}
+                onChange={handleInputChange}
+                placeholder="Enter input for your program here..."
+                disabled={isCompiling}
+                className="input-textarea"
+              />
+            </div>
+          )}
           
           <div className={`output-container ${error ? 'has-error' : ''}`}>
             <div className="output-header">
