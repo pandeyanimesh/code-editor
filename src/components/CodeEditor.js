@@ -12,9 +12,10 @@ function CodeEditor({ theme = 'light', setTheme }) {
       code: '', 
       input: '', 
       output: '', 
+      expectedOutput: '', // Added expected output field
       error: '', 
       status: 'idle', 
-      showInput: false 
+      testPassed: null // Added test result status
     }
   ]);
   
@@ -74,9 +75,10 @@ int main() {
       code: defaultCode, 
       input: '', 
       output: '', 
+      expectedOutput: '', // Added expected output field
       error: '', 
       status: 'idle', 
-      showInput: false 
+      testPassed: null // Added test result status
     }]);
     setActiveTabId(newTabId);
   };
@@ -114,13 +116,7 @@ int main() {
 
   const handleEditorChange = (value, tabId) => {
     updateTabProperty(tabId, 'code', value);
-    
-    // Check if code likely needs input (contains cin, getline, etc.)
-    const needsInput = value.includes('cin') || 
-                       value.includes('getline') || 
-                       value.includes('scanf');
-    
-    updateTabProperty(tabId, 'showInput', needsInput);
+    // Input section is always visible, so we don't need to check for input requirements
   };
 
   const handleEditorDidMount = (editor, monaco, tabId) => {
@@ -134,6 +130,11 @@ int main() {
 
   const handleInputChange = (e) => {
     updateTabProperty(activeTabId, 'input', e.target.value);
+  };
+
+  // Handler for expected output changes
+  const handleExpectedOutputChange = (e) => {
+    updateTabProperty(activeTabId, 'expectedOutput', e.target.value);
   };
 
   const handleCompile = async () => {
@@ -152,7 +153,7 @@ int main() {
     setTabs(prevTabs => 
       prevTabs.map(tab => 
         tab.id === activeTabId 
-          ? { ...tab, status: 'compiling', error: '', output: '' } 
+          ? { ...tab, status: 'compiling', error: '', output: '', testPassed: null } 
           : tab
       )
     );
@@ -173,6 +174,12 @@ int main() {
         input: currentTab.input.trim()
       });
       
+      const output = response.data.output || '';
+      // Check if output matches expected output
+      const expectedOutput = currentTab.expectedOutput.trim();
+      const outputMatches = expectedOutput !== '' && 
+                           output.trim() === expectedOutput;
+      
       // After receiving response, update with a single setTabs call again
       setTabs(prevTabs => 
         prevTabs.map(tab => 
@@ -180,8 +187,9 @@ int main() {
             ? { 
                 ...tab, 
                 status: response.data.success ? 'success' : 'error',
-                output: response.data.output || '',
-                error: response.data.success ? '' : (response.data.message || 'Compilation failed')
+                output: output,
+                error: response.data.success ? '' : (response.data.message || 'Compilation failed'),
+                testPassed: expectedOutput !== '' ? outputMatches : null
               } 
             : tab
         )
@@ -197,7 +205,8 @@ int main() {
                 ...tab, 
                 status: 'error',
                 error: err.response?.data?.message || 'Failed to compile code',
-                output: err.response?.data?.output || ''
+                output: err.response?.data?.output || '',
+                testPassed: null
               } 
             : tab
         )
@@ -231,30 +240,12 @@ int main() {
     // Clear all output properties in a single state update
     setTabs(prevTabs => prevTabs.map(tab => 
       tab.id === activeTabId ? 
-        { ...tab, output: '', error: '', status: 'idle' } : 
+        { ...tab, output: '', error: '', status: 'idle', testPassed: null } : 
         tab
     ));
   };
 
-  const setCodeExample = (example) => {
-    if (example === 'input') {
-      updateTabProperty(activeTabId, 'code', inputCode);
-      updateTabProperty(activeTabId, 'showInput', true);
-      
-      // Update the editor instance for the active tab
-      if (editorsRef.current[activeTabId]) {
-        editorsRef.current[activeTabId].setValue(inputCode);
-      }
-    } else {
-      updateTabProperty(activeTabId, 'code', defaultCode);
-      updateTabProperty(activeTabId, 'showInput', false);
-      
-      // Update the editor instance for the active tab
-      if (editorsRef.current[activeTabId]) {
-        editorsRef.current[activeTabId].setValue(defaultCode);
-      }
-    }
-  };
+  // We've removed the example code functionality
 
   // Toggle between light and dark themes
   const toggleTheme = () => {
@@ -313,17 +304,7 @@ int main() {
         {/* Reorganized button row - example buttons on left, action buttons on right */}
         <div className="editor-controls">
           <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
-            {/* Example buttons on left */}
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => setCodeExample('no-input')} className="example-button">
-                Basic Example
-              </button>
-              <button onClick={() => setCodeExample('input')} className="example-button">
-                Input Example
-              </button>
-            </div>
-            
-            {/* Status in middle */}
+            {/* Status on left */}
             <div className="status-indicator">
               {activeTab.status === 'compiling' && <span className="status compiling">Compiling...</span>}
               {activeTab.status === 'success' && <span className="status success">Compilation Successful</span>}
@@ -382,22 +363,19 @@ int main() {
         </div>
         
         <div className="output-section">
-          {/* Input container that shows only when needed */}
-          {activeTab.showInput && (
-            <div className="input-container">
-              <div className="input-header">
-                <h3>Program Input</h3>
-              </div>
-              <textarea
-                value={activeTab.input}
-                onChange={handleInputChange}
-                placeholder="Enter input for your program here..."
-                disabled={isCompiling}
-                className="input-textarea"
-              />
+          {/* Input container - always visible */}
+          <div className="input-container">
+            <div className="input-header">
+              <h3>Program Input</h3>
             </div>
-          )}
-          
+            <textarea
+              value={activeTab.input}
+              onChange={handleInputChange}
+              placeholder="Enter input for your program here..."
+              disabled={isCompiling}
+              className="input-textarea"
+            />
+          </div>
           <div className={`output-container ${activeTab.error ? 'has-error' : ''}`}>
             <div className="output-header">
               {activeTab.error ? (
@@ -408,7 +386,17 @@ int main() {
             </div>
             <div className="output-content">
               {activeTab.error && <pre className="error-message">{activeTab.error}</pre>}
-              {activeTab.output && <pre className="output-text">{activeTab.output}</pre>}
+              {activeTab.output && (
+                <>
+                  <pre className="output-text">{activeTab.output}</pre>
+                  {/* Display test result if expected output is provided */}
+                  {activeTab.testPassed !== null && (
+                    <div className={`test-result ${activeTab.testPassed ? 'test-passed' : 'test-failed'}`}>
+                      {activeTab.testPassed ? 'Test Case Passed! ✅' : 'Test Case Failed! ❌'}
+                    </div>
+                  )}
+                </>
+              )}
               {!activeTab.error && !activeTab.output && activeTab.status !== 'compiling' && (
                 <div className="empty-output">
                   <p>No output to display yet. Click "Compile & Run" to execute your code.</p>
@@ -417,6 +405,21 @@ int main() {
               {activeTab.status === 'compiling' && <div className="compiling-indicator">Compiling and running your code...</div>}
             </div>
           </div>
+          {/* Expected Output Container (Always Visible) */}
+          <div className="input-container expected-output-container">
+            <div className="input-header">
+              <h3>Expected Output</h3>
+            </div>
+            <textarea
+              value={activeTab.expectedOutput}
+              onChange={handleExpectedOutputChange}
+              placeholder="Enter expected output for test verification..."
+              disabled={isCompiling}
+              className="input-textarea"
+            />
+          </div>
+          
+          
         </div>
       </div>
       
