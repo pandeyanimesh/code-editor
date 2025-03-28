@@ -1,0 +1,59 @@
+/* src/App.css */
+.App {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.code-editor-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.editor-wrapper {
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.compile-button {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.compile-button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.output-container, .error-container {
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 15px;
+  min-height: 100px;
+}
+
+.error-container {
+  background-color: #fff8f8;
+  border-color: #ffb6b6;
+}
+
+pre {
+  margin: 0;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
