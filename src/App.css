@@ -7,6 +7,7 @@ body {
     sans-serif;
   background-color: #f5f5f5;
   color: #333;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .App {
@@ -24,22 +25,190 @@ body {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   padding: 20px;
   margin-bottom: 30px;
+  transition: all 0.3s ease;
+}
+
+/* Dark Theme Support */
+.dark-theme {
+  background-color: #1e1e1e;
+  color: #e0e0e0;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .editor-header,
+.dark-theme .editor-footer {
+  border-color: #444;
+}
+
+.dark-theme .input-container,
+.dark-theme .output-container {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+.dark-theme .input-textarea {
+  background-color: #333;
+  color: #e0e0e0;
+  border-color: #555;
+}
+
+.dark-theme .editor-loading {
+  background-color: #333;
+  color: #e0e0e0;
+}
+
+.dark-theme .empty-output,
+.dark-theme .compiling-indicator {
+  color: #aaa;
+}
+
+.dark-theme .example-button,
+.dark-theme .clear-button {
+  background-color: #444;
+  color: #e0e0e0;
+  border-color: #555;
+}
+
+.dark-theme .example-button:hover,
+.dark-theme .clear-button:hover {
+  background-color: #555;
+}
+
+.dark-theme .output-content {
+  color: #e0e0e0;
 }
 
 .editor-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   padding-bottom: 10px;
   border-bottom: 1px solid #eee;
-  flex-wrap: wrap;
-  gap: 10px;
+  gap: 15px;
 }
 
 .editor-header h1 {
-  color: #333;
+  color: inherit;
   margin: 0;
   font-size: 24px;
+}
+
+/* Tabs Styling */
+.tab-controls {
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 10px;
+}
+
+.tabs-container {
+  display: flex;
+  border-bottom: 1px solid #ddd;
+}
+
+.dark-theme .tabs-container {
+  border-bottom-color: #444;
+}
+
+.tab {
+  padding: 10px 15px;
+  cursor: pointer;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  margin-right: 2px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  position: relative;
+  user-select: none;
+  min-width: 100px;
+  flex-shrink: 0;
+}
+
+.dark-theme .tab {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+.tab.active {
+  background-color: white;
+  border-bottom: 1px solid white;
+  margin-bottom: -1px;
+  font-weight: 600;
+}
+
+.dark-theme .tab.active {
+  background-color: #1e1e1e;
+  border-bottom: 1px solid #1e1e1e;
+}
+
+.tab-name {
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tab-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  padding: 0;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.7;
+  transition: all 0.2s;
+}
+
+.tab-close:hover {
+  opacity: 1;
+  background-color: rgba(255, 0, 0, 0.1);
+}
+
+.dark-theme .tab-close:hover {
+  background-color: rgba(255, 0, 0, 0.2);
+}
+
+.add-tab {
+  padding: 10px 15px;
+  cursor: pointer;
+  background-color: transparent;
+  border: 1px solid #ddd;
+  border-bottom: none;
+  margin-right: 2px;
+  border-top-left-radius: 4px;
+  border-top-right-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.dark-theme .add-tab {
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.add-tab:hover {
+  background-color: #f0f0f0;
+}
+
+.dark-theme .add-tab:hover {
+  background-color: #333;
+}
+
+.editor-controls {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
 }
 
 .code-examples {
@@ -62,6 +231,36 @@ body {
   background-color: #e8e8e8;
 }
 
+/* Theme Toggle and Save Buttons */
+.theme-button,
+.save-button {
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid #ddd;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.dark-theme .theme-button,
+.dark-theme .save-button {
+  border-color: #444;
+  background-color: #444;
+  color: #e0e0e0;
+}
+
+.theme-button:hover,
+.save-button:hover {
+  background-color: #e8e8e8;
+}
+
+.dark-theme .theme-button:hover,
+.dark-theme .save-button:hover {
+  background-color: #555;
+}
+
 .status-indicator {
   display: flex;
   align-items: center;
@@ -79,14 +278,29 @@ body {
   color: #f57c00;
 }
 
+.dark-theme .status.compiling {
+  background-color: #4d3800;
+  color: #ffb74d;
+}
+
 .status.success {
   background-color: #e8f5e9;
   color: #2e7d32;
 }
 
+.dark-theme .status.success {
+  background-color: #1b4d1f;
+  color: #81c784;
+}
+
 .status.error {
   background-color: #ffebee;
   color: #c62828;
+}
+
+.dark-theme .status.error {
+  background-color: #4c1313;
+  color: #ef9a9a;
 }
 
 .editor-output-container {
@@ -103,6 +317,10 @@ body {
   overflow: hidden;
   min-height: 500px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.dark-theme .editor-wrapper {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .editor-toolbar {
@@ -171,6 +389,15 @@ body {
   cursor: not-allowed;
 }
 
+.dark-theme .compile-button {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.dark-theme .compile-button:disabled {
+  background-color: #555;
+  color: #999;
+}
+
 .clear-button {
   background-color: #f5f5f5;
   color: #333;
@@ -212,11 +439,16 @@ body {
   border-bottom: 1px solid #ddd;
 }
 
+.dark-theme .input-header {
+  background-color: #333;
+  border-bottom-color: #444;
+}
+
 .input-header h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: inherit;
 }
 
 .input-textarea {
@@ -234,13 +466,26 @@ body {
   background-color: #f9f9f9;
 }
 
+.dark-theme .input-textarea:focus {
+  background-color: #383838;
+}
+
 .input-textarea::placeholder {
   color: #999;
+}
+
+.dark-theme .input-textarea::placeholder {
+  color: #777;
 }
 
 .input-textarea:disabled {
   background-color: #f1f1f1;
   color: #777;
+}
+
+.dark-theme .input-textarea:disabled {
+  background-color: #2a2a2a;
+  color: #999;
 }
 
 /* Output Container Styling */
@@ -260,10 +505,24 @@ body {
   border-color: #ffb6b6;
 }
 
+.dark-theme .output-container {
+  background-color: #2d2d2d;
+  border-color: #444;
+}
+
+.dark-theme .output-container.has-error {
+  border-color: #c62828;
+}
+
 .output-header {
   background-color: #f5f5f5;
   padding: 10px 15px;
   border-bottom: 1px solid #ddd;
+}
+
+.dark-theme .output-header {
+  background-color: #333;
+  border-bottom-color: #444;
 }
 
 .output-container.has-error .output-header {
@@ -271,15 +530,24 @@ body {
   border-bottom-color: #ffb6b6;
 }
 
+.dark-theme .output-container.has-error .output-header {
+  background-color: #4c1313;
+  border-bottom-color: #c62828;
+}
+
 .output-header h3 {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
-  color: #333;
+  color: inherit;
 }
 
 .output-container.has-error .output-header h3 {
   color: #d32f2f;
+}
+
+.dark-theme .output-container.has-error .output-header h3 {
+  color: #ef9a9a;
 }
 
 .output-content {
@@ -295,6 +563,10 @@ body {
   font-family: 'Courier New', Courier, monospace;
   font-size: 14px;
   line-height: 1.5;
+}
+
+.dark-theme .error-message {
+  color: #ef9a9a;
 }
 
 .output-text {
@@ -325,6 +597,10 @@ body {
   padding: 20px;
 }
 
+.dark-theme .compiling-indicator {
+  color: #64b5f6;
+}
+
 .editor-footer {
   text-align: center;
   padding-top: 20px;
@@ -333,27 +609,67 @@ body {
   font-size: 13px;
 }
 
-@media (max-width: 768px) {
-  .editor-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  
-  .editor-output-container {
-    flex-direction: column;
-  }
-  
-  .editor-wrapper, .output-section {
-    width: 100%;
-  }
-  
-  .button-container {
-    justify-content: flex-end;
-  }
-  
-  .compile-button, .clear-button {
-    padding: 10px 16px;
-    font-size: 13px;
-  }
+/* Animation for tab transitions */
+.tab {
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Tab hover effects */
+.tab:hover:not(.active) {
+  background-color: #f0f0f0;
+}
+
+.dark-theme .tab:hover:not(.active) {
+  background-color: #333;
+}
+
+/* Improve tab close button positioning */
+/* Improve tab close button positioning */
+.tab-close {
+  position: relative;
+  margin-left: 4px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Animated status indicators */
+@keyframes pulse {
+  0% { opacity: 0.7; }
+  50% { opacity: 1; }
+  100% { opacity: 0.7; }
+}
+
+.status.compiling {
+  animation: pulse 1.5s infinite;
+}
+
+/* Improve compile button states */
+.compile-button:active {
+  transform: translateY(1px);
+}
+
+.compile-button:disabled {
+  transform: none;
+}
+
+/* Enhance editor focus states */
+.input-textarea:focus {
+  box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.5);
+}
+
+/* Fixed-width editor for desktop views */
+.editor-wrapper {
+  min-width: 600px;
+}
+
+/* Tab list with fixed height */
+.tabs-container {
+  height: 40px;
+  overflow-x: visible;
+}
+
+.tab, .add-tab {
+  height: 100%;
+  display: flex;
+  align-items: center;
 }
